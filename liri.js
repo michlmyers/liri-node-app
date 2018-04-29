@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 var keys = require("./keys.js");
-
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require('request');
@@ -45,8 +44,9 @@ function tweetList() {
         if (!error) {
             console.log('******************************TWEETS**********************************************************');
             for (var i = 0; i < tweets.length; i++) {
-                console.log(tweets[i].created_at);
-                console.log(tweets[i].text);
+                var tweetResponse = tweets[i].created_at + '\n' + tweets[i].text;
+                console.log(tweetResponse);
+                logStuff(tweetResponse);
             }
             console.log('*********************************END******TWEETS*************************************************');
         } else {
@@ -68,12 +68,15 @@ function spotifyThisSong(songName) {
         }
         var apiData = data.tracks.items;
         var artistName = JSON.stringify(apiData[0].album.artists, ['name']);
-        console.log('******************************SONG**********************************************************');
-        console.log('Artist: ' + artistName,
-            '\nSong: ' + apiData[0].name,
-            '\nPreview link: ' + apiData[0].preview_url,
-            '\nAlbum: ' + apiData[0].album.name),
-            console.log('***********************END*******SONG**********************************************************');
+        var spotifyResults =
+            '******************************SONG**********************************************************' + '\n' +
+            'Artist: ' + artistName +
+            '\n' + 'Song: ' + apiData[0].name +
+            '\n' + 'Preview link: ' + apiData[0].preview_url +
+            '\n' + 'Album: ' + apiData[0].album.name +
+            '\n' + '***********************END*******SONG**********************************************************';
+        console.log(spotifyResults);
+        logStuff(spotifyResults);
     }
     )
 };
@@ -86,17 +89,20 @@ function movieNotes() {
     var queryURL = 'http://www.omdbapi.com/?apikey=trilogy&t=' + movieName;
     request(queryURL, function (error, response, body) {
         if (!error && response.statusCode === 200) {
-            console.log('******************************MOVIE**********************************************************');
             var movieItems = JSON.parse(body);
-            console.log('Your movie: ' + movieItems.Title, '\nWas released in: ' + movieItems.Year,
-                '\nHas an IMDB rating of: ' + movieItems.Ratings[0].Value,
-                '\nHas a Rotten Tomatoes rating of: ' + movieItems.Ratings[1].Value,
-                '\nWas produced in: ' + movieItems.Country,
-                '\nIs in the language of: ' + movieItems.Language,
-                '\nThis is the plot: ' + movieItems.Plot,
-                '\nThese are the actors in it: ' + movieItems.Actors,
-                '\n**********************************END***MOVIE****************************************************'
-            );
+            var movieResults =
+                '******************************MOVIE**********************************************************' + '\n' +
+                'Your movie: ' + movieItems.Title + '\n' + 'Was released in: ' + movieItems.Year +
+                '\n' + 'Has an IMDB rating of: ' + movieItems.Ratings[0].Value +
+                '\n' + 'Has a Rotten Tomatoes rating of: ' + movieItems.Ratings[1].Value +
+                '\n' + 'Was produced in: ' + movieItems.Country +
+                '\n' + 'Is in the language of: ' + movieItems.Language +
+                '\n' + 'This is the plot: ' + movieItems.Plot +
+                '\n' + 'These are the actors in it: ' + movieItems.Actors +
+                '\n' + '**********************************END***MOVIE****************************************************'
+                ;
+            console.log(movieResults);
+            logStuff(movieResults);
         }
     });
 }
@@ -111,4 +117,14 @@ function doWhat() {
         spotifyThisSong(dataSplit[1]);
     });
 }
+
+function logStuff(logOutput) {
+    fs.appendFile('log.txt', logOutput, function (err) {
+        if (err) {
+            return consolelog('Log function did not work and data did not append');
+        }
+    });
+}
+
+
 
