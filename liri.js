@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 var keys = require("./keys.js");
-// var spotify = new Spotify(keys.spotify);
 
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
@@ -22,22 +21,25 @@ var spotify = new Spotify({
     secret: keys.spotify.secret
 });
 
-switch (userInput){
+switch (userInput) {
     case 'my-tweets':
-    tweetList();
-    break;
+        tweetList();
+        break;
+
     case 'movie-this':
-    movieNotes();
-    break;
+        movieNotes();
+        break;
+
     case 'spotify-this-song':
-    spotifyThisSong();
-    break;
+        spotifyThisSong();
+        break;
+
     case 'do-what-it-says':
-    doWhat();
-    break;
+        doWhat();
+        break;
 }
 
-function tweetList(){
+function tweetList() {
     var params = { screen_name: 'tunesdawg' };
     client.get('statuses/user_timeline', params, function (error, tweets, response) {
         if (!error) {
@@ -56,6 +58,9 @@ function tweetList(){
 function spotifyThisSong(songName) {
     // var songName = process.argv[3];
     var trackName = process.argv[3];
+    if (!trackName) {
+        trackName = 'i saw the sign';
+    }
     spotify.search({ type: "track", query: trackName, limit: 1 }, function (err, data) {
         if (err) {
             console.log('error occurred: ' + err);
@@ -65,7 +70,7 @@ function spotifyThisSong(songName) {
         var artistName = JSON.stringify(apiData[0].album.artists, ['name']);
         console.log('******************************SONG**********************************************************');
         console.log('Artist: ' + artistName,
-            '\nSong: ' + apiData[0].name, 
+            '\nSong: ' + apiData[0].name,
             '\nPreview link: ' + apiData[0].preview_url,
             '\nAlbum: ' + apiData[0].album.name),
             console.log('***********************END*******SONG**********************************************************');
@@ -73,7 +78,7 @@ function spotifyThisSong(songName) {
     )
 };
 
-function movieNotes(){
+function movieNotes() {
     var movieName = process.argv[3];
     if (!movieName) {
         movieName = 'mr.nobody';
@@ -96,7 +101,14 @@ function movieNotes(){
     });
 }
 
-function doWhat(){
-    console.log('dwsays being read');
+function doWhat() {
+    fs.readFile("random.txt", "utf8", function (error, data) {
+        if (error) {
+            return console.log('whoops: ' + error);
+        }
+        var dataSplit = data.split(",");
+        process.argv[3] = dataSplit[1];
+        spotifyThisSong(dataSplit[1]);
+    });
 }
 
